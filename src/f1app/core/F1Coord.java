@@ -1,9 +1,18 @@
 package f1app.core;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -14,6 +23,8 @@ public enum F1Coord {
 	INSTANCE;
 
 	private List<Circuit> circuits;
+	private static final Path TIMES_FILE = Paths.get(System.getProperty("user.dir") + "/src/Resources/data/f1app.times");
+	private Map<Circuits, Map<Tyres, LapTime>> circuitsAndTimes = new HashMap<>();
 
 	/**
 	 * @return the instance of F1Coord
@@ -28,13 +39,52 @@ public enum F1Coord {
 	 */
 	public boolean loadCircuitData() {
 		circuits = new ArrayList<>();
-		File file = new File(System.getProperty("user.dir") + "/src/Resources/data/data.txt");
+		Path path = Paths.get(System.getProperty("user.dir") + "/src/Resources/data/data.txt");
 
-		try (Scanner scanner = new Scanner(file)) {
+		try (Scanner scanner = new Scanner(path)) {
 			while (scanner.hasNextLine()) {
 				createCircuit(scanner.nextLine());
 			}
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Load the lap times from a file
+	 * @return if the load operation was successful
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean loadLapTimes() {
+		if (TIMES_FILE.toFile().exists()) {
+			try (ObjectInputStream is = new ObjectInputStream(new BufferedInputStream((Files.newInputStream(TIMES_FILE))))) {
+				circuitsAndTimes = (Map<Circuits, Map<Tyres,LapTime>>) is.readObject();
+				
+				for(Circuit circuit : circuits) {
+					EnumMap<Tyres, LapTime> map = (EnumMap<Tyres, LapTime>) circuitsAndTimes.get(circuit.getCircuitType());
+					circuit.setCircuitTimes(map);
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Saves the lap times to a file
+	 * @return if the save operation was successful
+	 */
+	public boolean saveLapTimes() {
+		try (ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(Files.newOutputStream(TIMES_FILE)))) {
+			for (Circuit circuit : circuits) {
+				circuitsAndTimes.put(circuit.getCircuitType(), circuit.getCircuitTimes());
+			}
+			os.writeObject(circuitsAndTimes);
+		} catch (IOException e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -60,9 +110,8 @@ public enum F1Coord {
 	 */
 	public Circuit addLapTime(LapTime lapTime, Circuits circuitType) {
 		for (Circuit circuit : circuits) {
-			if(circuit.getCircuitType() == circuitType) {
-				if(circuit.addLapTime(lapTime))
-					return circuit;
+			if (circuit.getCircuitType() == circuitType) {
+				if (circuit.addLapTime(lapTime)) return circuit;
 			}
 		}
 		return null;

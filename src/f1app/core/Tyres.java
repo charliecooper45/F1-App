@@ -1,6 +1,8 @@
 package f1app.core;
 
-public enum Tyres {
+import java.io.Serializable;
+
+public enum Tyres implements Serializable{
 	OPTION, PRIME, INTER, WET;
 	
 	@Override

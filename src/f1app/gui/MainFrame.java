@@ -41,6 +41,17 @@ public class MainFrame extends JFrame{
 				if (!f1Coord.loadCircuitData()) {
 					JOptionPane.showMessageDialog(MainFrame.this, "Failed to load data.txt", "Error", JOptionPane.ERROR_MESSAGE);
 					System.exit(-1);
+				} else if (!f1Coord.loadLapTimes()) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Failed to load previous lap times", "Error", JOptionPane.ERROR_MESSAGE);
+					System.exit(-1);
+				}
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				boolean test = f1Coord.saveLapTimes();
+				if(!test) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Failed to save lap times", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

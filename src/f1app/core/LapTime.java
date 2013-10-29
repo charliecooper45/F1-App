@@ -1,11 +1,14 @@
 package f1app.core;
 
+import java.io.Serializable;
+
 /**
  * Holds the minutes, seconds and milliseconds as well as the tyre used for a lap of a circuit.
  * @author Charlie
  *
  */
-public class LapTime implements Comparable<LapTime> {
+public class LapTime implements Comparable<LapTime>, Serializable {
+	private static final long serialVersionUID = 3273904973157446683L;
 	private Tyres tyreChoice;
 	private String minutes;
 	private String seconds;
@@ -35,7 +38,9 @@ public class LapTime implements Comparable<LapTime> {
 
 	@Override
 	public int compareTo(LapTime o) {
-		if(!minutes.equals(o.minutes)) { 
+		if(o == null) {
+			return -1;
+		} else if(!minutes.equals(o.minutes)) { 
 			return minutes.compareTo(o.minutes);
 		} else if (!seconds.equals(o.seconds)) {
 			return seconds.compareTo(o.seconds);

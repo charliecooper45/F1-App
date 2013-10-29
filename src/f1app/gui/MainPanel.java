@@ -80,6 +80,9 @@ public class MainPanel extends JPanel {
 		setupLowerPanel();
 		gc.gridy = 2;
 		add(lowerPanel, gc);
+		
+		// load Australia CircuitPanel
+		fireUpdateCircuitTime(f1Coord.getCircuit(Circuits.AUSTRALIA));
 	}
 
 	private void setupUpperPanel() {
@@ -216,39 +219,30 @@ public class MainPanel extends JPanel {
 	}
 
 	private void updateInformationPanel() {
+		System.out.println("Update information panel");
 		// Two switches, one to add a lap time and one to clear the displayed lap time if there is none stored
+		System.out.println(selectedCircuitPanel.times);
+		String text = null;
 		for (Map.Entry<Tyres, LapTime> entry : selectedCircuitPanel.times.entrySet()) {
-			if (entry.getValue() != null) {
+				if(entry.getValue() == null) 
+					text = "";
+				else 
+					text = entry.getValue().toString();
+				
 				switch (entry.getKey()) {
 				case OPTION:
-					optionTyreTime.setText(entry.getValue().toString());
+					optionTyreTime.setText(text);
 					break;
 				case PRIME:
-					primeTyreTime.setText(entry.getValue().toString());
+					primeTyreTime.setText(text);
 					break;
 				case INTER:
-					intermediateTyreTime.setText(entry.getValue().toString());
+					intermediateTyreTime.setText(text);
 					break;
 				case WET:
-					wetTyreTime.setText(entry.getValue().toString());
+					wetTyreTime.setText(text);
 					break;
 				}
-			} else {
-				switch (entry.getKey()) {
-				case OPTION:
-					optionTyreTime.setText("");
-					break;
-				case PRIME:
-					primeTyreTime.setText("");
-					break;
-				case INTER:
-					intermediateTyreTime.setText("");
-					break;
-				case WET:
-					wetTyreTime.setText("");
-					break;
-				}
-			}
 		}
 	}
 
@@ -302,12 +296,8 @@ public class MainPanel extends JPanel {
 		private Map<Tyres, LapTime> times;
 
 		public CircuitPanel(String countryName, String circuitName) {
-			times = new EnumMap<>(Tyres.class);
-			times.put(Tyres.OPTION, null);
-			times.put(Tyres.PRIME, null);
-			times.put(Tyres.INTER, null);
-			times.put(Tyres.WET, null);
-
+			Circuits circuit = Circuits.valueOf(countryName.toUpperCase().replace(" ", "_"));
+			times = f1Coord.getCircuit(circuit).getCircuitTimes();
 			this.countryName = countryName;
 			this.circuitName = circuitName;
 			setup();

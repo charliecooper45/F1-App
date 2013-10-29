@@ -52,7 +52,21 @@ public class Circuit {
 	 * @return the circuitTimes
 	 */
 	public Map<Tyres, LapTime> getCircuitTimes() {
-		return Collections.unmodifiableMap(circuitTimes);
+		return circuitTimes;
+	}
+	
+	/**
+	 * @param circuitTimes the circuitTimes to set
+	 */
+	public void setCircuitTimes(EnumMap<Tyres, LapTime> circuitTimes) {
+		this.circuitTimes = circuitTimes;
+		
+		// Add values for the remaining times
+		for(Tyres tyre : Tyres.values()) {
+			if(!circuitTimes.containsKey(tyre)) {
+				circuitTimes.put(tyre, null);
+			}
+		}
 	}
 
 	public boolean addLapTime(LapTime lapTime) {
