@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public enum F1Coord {
 	 */
 	public boolean loadCircuitData() {
 		circuits = new ArrayList<>();
-		Path path = Paths.get(System.getProperty("user.dir") + "/src/Resources/data/data.txt");
+		Path path = Paths.get(System.getProperty("user.dir") + "/src/Resources/data/data.csv");
 
 		try (Scanner scanner = new Scanner(path)) {
 			while (scanner.hasNextLine()) {
@@ -62,7 +61,7 @@ public enum F1Coord {
 				circuitsAndTimes = (Map<Circuits, Map<Tyres,LapTime>>) is.readObject();
 				
 				for(Circuit circuit : circuits) {
-					EnumMap<Tyres, LapTime> map = (EnumMap<Tyres, LapTime>) circuitsAndTimes.get(circuit.getCircuitType());
+					Map<Tyres, LapTime> map = (Map<Tyres, LapTime>) circuitsAndTimes.get(circuit.getCircuitType());
 					circuit.setCircuitTimes(map);
 				}
 			} catch (IOException | ClassNotFoundException e) {
@@ -116,9 +115,17 @@ public enum F1Coord {
 		}
 		return null;
 	}
+	
+	public Circuit deleteLapTime(Circuits circuitType, Tyres tyre) {
+		for (Circuit circuit : circuits) {
+			if(circuit.getCircuitType() == circuitType) {
+				if (circuit.deleteLapTime(tyre)) return circuit;
+			}
+		}
+		return null;
+	}
 
 	private void createCircuit(String line) {
-		// TODO NEXT B: CSV file
 		// Read the information about the circuit
 		try (Scanner scan = new Scanner(line)) {
 			scan.useDelimiter(",");
@@ -130,6 +137,4 @@ public enum F1Coord {
 			circuits.add(new Circuit(circuit, length, lapRecord, time2013));
 		}
 	}
-
-	//TODO NEXT: Load + Save track times (object to hold them which is serializable)
 }

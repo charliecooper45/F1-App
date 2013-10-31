@@ -2,6 +2,7 @@ package f1app.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -9,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class MainPanel extends JPanel {
 	private JPanel upperPanel;
 	// Listeners for different events
 	private CircuitPanelListener circuitListener;
-	private AddLapListener addLapListener;
+	private LapButtonsListener lapsButtonsListener;
 	private JScrollPane scrollPane;
 	private JPanel lowerPanel;
 	private JPanel informationPanel;
@@ -52,6 +52,8 @@ public class MainPanel extends JPanel {
 	private JLabel intermediateTyreTime;
 	private JLabel wetTyreTime;
 	private JButton addTimeButton;
+	//TODO NEXT: Add a deleteTimeButton to remove lap times
+	private JButton deleteTimeButton;
 
 	public MainPanel() {
 		setup();
@@ -194,21 +196,41 @@ public class MainPanel extends JPanel {
 		gcInformationPanel.gridy = 9;
 		wetTyreTime = new JLabel();
 		informationPanel.add(wetTyreTime, gcInformationPanel);
-		// TODO NEXT: Add functionality for adding a new time
-		gcInformationPanel.gridx = 1;
-		gcInformationPanel.gridy = 10;
-		gcInformationPanel.gridwidth = 2;
-		gcInformationPanel.anchor = GridBagConstraints.CENTER;
-		addTimeButton = new JButton("Add New Time");
-		addTimeButton.addActionListener(new ActionListener() {
+		
+		// The JPanel to hold the two buttons that add and remove times
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setBackground(Color.GREEN);
+		FlowLayout flow = (FlowLayout) buttonPanel.getLayout();
+		flow.setHgap(20);
+		ActionListener buttonActionListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO NEXT B: Add an argument with the current circuit, this can be used to set the drop down menu
-				addLapListener.buttonPressed();
-			}
-		});
-		informationPanel.add(addTimeButton, gcInformationPanel);
+				JButton buttonPressed = (JButton)e.getSource();
+				
+				if(buttonPressed == addTimeButton) {
+					//TODO NEXT B: Add an argument with the current circuit, this can be used to set the drop down menu
+					lapsButtonsListener.addLapPressed();
+				} else {
+					// TODO NEXT B: Change AddLapListener to modifyLapListener and add functionality for removing laps
+					lapsButtonsListener.deleteLapPressed();
+				}
 
+			}
+		};
+		addTimeButton = new JButton("Add Time");
+		addTimeButton.addActionListener(buttonActionListener);
+		deleteTimeButton = new JButton("Delete Time");
+		deleteTimeButton.addActionListener(buttonActionListener);
+		buttonPanel.add(addTimeButton);
+		buttonPanel.add(deleteTimeButton);
+		gcInformationPanel.gridwidth = 2;
+		gcInformationPanel.weighty = 0.2;
+		gcInformationPanel.gridx = 1;
+		gcInformationPanel.gridy = 10;
+		gcInformationPanel.fill = GridBagConstraints.BOTH;
+		informationPanel.add(buttonPanel, gcInformationPanel);
+		addTimeButton.setPreferredSize(deleteTimeButton.getPreferredSize());
+		
 		// Set the first track displayed (Australia)
 		Circuits selectedCircuitType = Circuits.AUSTRALIA;
 		Circuit circuit = f1Coord.getCircuit(selectedCircuitType);
@@ -219,9 +241,7 @@ public class MainPanel extends JPanel {
 	}
 
 	private void updateInformationPanel() {
-		System.out.println("Update information panel");
 		// Two switches, one to add a lap time and one to clear the displayed lap time if there is none stored
-		System.out.println(selectedCircuitPanel.times);
 		String text = null;
 		for (Map.Entry<Tyres, LapTime> entry : selectedCircuitPanel.times.entrySet()) {
 				if(entry.getValue() == null) 
@@ -267,12 +287,13 @@ public class MainPanel extends JPanel {
 	/**
 	 * @param addLapListener the addLapListener to set
 	 */
-	public void setAddLapListener(AddLapListener addLapListener) {
-		this.addLapListener = addLapListener;
+	public void setLapsButtonsListener(LapButtonsListener addLapListener) {
+		this.lapsButtonsListener = addLapListener;
 	}
 
 	public void fireUpdateCircuitTime(Circuit circuit) {
 		for (CircuitPanel circuitPanel : circuits) {
+			//TODO NEXT B: Is this the best way of doing this??!
 			if (circuitPanel.countryName.equals(circuit.getCircuitType().getCountry())) {
 				circuitPanel.updateTimes(circuit.getCircuitTimes());
 			}
