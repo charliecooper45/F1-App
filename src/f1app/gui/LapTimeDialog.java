@@ -25,13 +25,15 @@ public abstract class LapTimeDialog extends JDialog {
 	protected Insets comboInsets;
 	protected Insets defaultInsets;
 	private JLabel messageLabel;
+	private String selectedCircuit;
 	private JLabel circuitLabel;
 	protected JComboBox<Circuits> circuitsCombo;
 	private JLabel tyresLabel;
 	protected JComboBox<Tyres> tyresCombo;
 
-	public LapTimeDialog(Frame aFrame, String title) {
+	public LapTimeDialog(Frame aFrame, String title, String selectedCircuit) {
 		super(aFrame, title, true);
+		this.selectedCircuit = selectedCircuit;
 		setSize(new Dimension((aFrame.getWidth() / 3), (aFrame.getHeight() / 3)));
 		setLocationRelativeTo(aFrame);
 		setup();
@@ -64,7 +66,8 @@ public abstract class LapTimeDialog extends JDialog {
 		gcDialog.fill = GridBagConstraints.HORIZONTAL;
 		gcDialog.insets = comboInsets;
 		circuitsCombo = new JComboBox<>(Circuits.values());
-		circuitsCombo.setSelectedIndex(0);
+		Circuits selected = Circuits.valueOf(selectedCircuit.toUpperCase().replace(" ", "_"));
+		circuitsCombo.setSelectedItem(selected);
 		add(circuitsCombo, gcDialog);
 
 		gcDialog.gridx = 1;

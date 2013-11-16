@@ -21,8 +21,8 @@ public class DeleteLapTimeDialog extends LapTimeDialog {
 	private static final long serialVersionUID = 1L;
 	private JButton deleteButton;
 
-	public DeleteLapTimeDialog(Frame aFrame) {
-		super(aFrame, "Delete a lap time");
+	public DeleteLapTimeDialog(Frame aFrame, String selectedCircuit) {
+		super(aFrame, "Delete a lap time", selectedCircuit);
 		addComponents();
 	}
 	

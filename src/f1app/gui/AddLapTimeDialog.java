@@ -22,14 +22,13 @@ import f1app.core.Tyres;
  *
  */
 public class AddLapTimeDialog extends LapTimeDialog {
-
 	private static final long serialVersionUID = 1L;
 	private JLabel timeLabel;
 	private JTextField lapTimeField;
 	private JButton addButton;
 
-	public AddLapTimeDialog(Frame aFrame) {
-		super(aFrame, "Add a lap time");
+	public AddLapTimeDialog(Frame aFrame, String selectedCircuit) {
+		super(aFrame, "Add a lap time", selectedCircuit);
 		addComponents();
 	}
 

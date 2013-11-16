@@ -11,7 +11,7 @@ import f1app.core.Circuits;
 import f1app.core.F1Coord;
 import f1app.core.LapTime;
 import f1app.core.Tyres;
-
+//TODO NEXT: Set the ICON
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public static final int WIDTH = 750;
@@ -27,6 +27,9 @@ public class MainFrame extends JFrame {
 	public MainFrame() {
 		super("F1 2013 Lap Time Application");
 		setup();
+		int width = getWidth() - (getInsets().left + getInsets().right);
+		int height = getHeight() - (getInsets().top + getInsets().bottom);
+		System.out.println("Frame size: " + width + " : " + height);
 	}
 
 	private void setup() {
@@ -89,15 +92,15 @@ public class MainFrame extends JFrame {
 					// Listens for clicks of the add and remove lap times buttons
 					mainScreen.setLapsButtonsListener(new LapButtonsListener() {
 						@Override
-						public void addLapPressed() {
-							LapTimeDialog dialog = new AddLapTimeDialog(MainFrame.this);
+						public void addLapPressed(String selectedCircuit) {
+							LapTimeDialog dialog = new AddLapTimeDialog(MainFrame.this, selectedCircuit);
 							dialog.setNewLapTimeListener(lapTimeChangeListener);
 							dialog.setVisible(true);
 						}
 
 						@Override
-						public void deleteLapPressed() {
-							LapTimeDialog dialog = new DeleteLapTimeDialog(MainFrame.this);
+						public void deleteLapPressed(String selectedCircuit) {
+							LapTimeDialog dialog = new DeleteLapTimeDialog(MainFrame.this, selectedCircuit);
 							dialog.setNewLapTimeListener(lapTimeChangeListener);
 							dialog.setVisible(true);
 						}

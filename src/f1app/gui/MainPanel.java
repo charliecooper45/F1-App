@@ -52,7 +52,6 @@ public class MainPanel extends JPanel {
 	private JLabel intermediateTyreTime;
 	private JLabel wetTyreTime;
 	private JButton addTimeButton;
-	//TODO NEXT: Add a deleteTimeButton to remove lap times
 	private JButton deleteTimeButton;
 
 	public MainPanel() {
@@ -129,7 +128,6 @@ public class MainPanel extends JPanel {
 	}
 
 	private void setupInformationPanel() {
-		// TODO NEXT: The information panel is resizing automatically, need to stop this
 		informationPanel = new JPanel();
 		informationPanel.setPreferredSize(new Dimension(250, 100));
 		informationPanel.setBackground(Color.GREEN);
@@ -208,11 +206,9 @@ public class MainPanel extends JPanel {
 				JButton buttonPressed = (JButton)e.getSource();
 				
 				if(buttonPressed == addTimeButton) {
-					//TODO NEXT B: Add an argument with the current circuit, this can be used to set the drop down menu
-					lapsButtonsListener.addLapPressed();
+					lapsButtonsListener.addLapPressed(selectedCircuitPanel.countryName);
 				} else {
-					// TODO NEXT B: Change AddLapListener to modifyLapListener and add functionality for removing laps
-					lapsButtonsListener.deleteLapPressed();
+					lapsButtonsListener.deleteLapPressed(selectedCircuitPanel.countryName);
 				}
 
 			}
@@ -268,7 +264,7 @@ public class MainPanel extends JPanel {
 
 	private void setupCircuitPanel() {
 		circuitPanel = new JPanel();
-		circuitPanel.setBackground(Color.ORANGE);
+		circuitPanel.setBackground(Color.WHITE);
 		circuitPanel.setLayout(new GridBagLayout());
 		GridBagConstraints gcCircuitPanel = new GridBagConstraints();
 		gcCircuitPanel.weightx = 1;
@@ -291,15 +287,23 @@ public class MainPanel extends JPanel {
 		this.lapsButtonsListener = addLapListener;
 	}
 
+	/**
+	 * Updates the times Map in the CircuitPanel object that has been edited, also changes the displayed CircuitPanel if necessary.
+	 * @param circuit, the Circuit object that has been updated
+	 */
 	public void fireUpdateCircuitTime(Circuit circuit) {
 		for (CircuitPanel circuitPanel : circuits) {
-			//TODO NEXT B: Is this the best way of doing this??!
 			if (circuitPanel.countryName.equals(circuit.getCircuitType().getCountry())) {
 				circuitPanel.updateTimes(circuit.getCircuitTimes());
+				if(selectedCircuitPanel != circuitPanel) {
+					// Sets the displayed CircuitPanel as the one that has just been edited
+					circuitListener.mouseClicked(new MouseEvent(circuitPanel, MouseEvent.MOUSE_PRESSED, 0, 0, 0, 0, 1, false));
+				}
+				break;
 			}
 		}
 	}
-
+	
 	/**
 	 * JPanel that displays a circuit`s name, location and image
 	 * @author Charlie
@@ -350,7 +354,7 @@ public class MainPanel extends JPanel {
 
 			// If Australia then displayed as default
 			if (countryName.equals("Australia")) {
-				setFontColor(Color.RED);
+				setFontColor(Color.WHITE);
 				setBackground(Color.GRAY);
 			}
 		}
@@ -398,17 +402,17 @@ public class MainPanel extends JPanel {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			CircuitPanel clicked = (CircuitPanel) e.getSource();
-
+			
 			// Set the previously clicked CircuitPanel back to the default colours
 			for (CircuitPanel circuitPanel : circuits) {
-				if (circuitPanel.getFontColor() == Color.RED) {
+				if (circuitPanel.getFontColor() == Color.WHITE) {
 					circuitPanel.setFontColor(Color.BLACK);
 					circuitPanel.setBackground(Color.WHITE);
 				}
 			}
 
 			// Highlight the newly selected CircuitPanel
-			clicked.setFontColor(Color.RED);
+			clicked.setFontColor(Color.WHITE);
 			clicked.setBackground(Color.GRAY);
 
 			// Change the circuit picture
@@ -428,6 +432,4 @@ public class MainPanel extends JPanel {
 			updateInformationPanel();
 		}
 	}
-
-	//TODO NEXT B: Circuit name at the top could maybe be on a new JPanel centred?
 }
