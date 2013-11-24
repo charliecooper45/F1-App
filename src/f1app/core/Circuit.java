@@ -1,6 +1,5 @@
 package f1app.core;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
